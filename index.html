@@ -4,13 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#d94f87">
-  <meta name="description" content="Controle financeiro pessoal simples e bonito.">
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%23d94f87'/%3E%3Ctext x='96' y='131' font-size='104' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'%3ER%3C/text%3E%3C/svg%3E">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Finanças">
   <title>Meu Controle Financeiro</title>
+  <link rel="manifest" href="manifest.json">
   <style>
     :root {
       --pink: #d94f87;
@@ -23,771 +18,599 @@
       --muted: #7e7077;
       --border: #eedde5;
       --danger: #ca365a;
+      --success: #1f7a56;
       --shadow: 0 12px 30px rgba(156, 66, 105, 0.11);
       --radius: 22px;
     }
+
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html { scroll-behavior: smooth; }
+
     body {
       margin: 0;
       color: var(--text);
       background: radial-gradient(circle at top right, #f8d8e7 0, transparent 28rem), var(--background);
       font-family: Inter, ui-rounded, "Segoe UI", Arial, sans-serif;
       min-height: 100vh;
+      padding-bottom: 104px;
     }
+
     button, input, select { font: inherit; }
     button { cursor: pointer; }
-    .app { width: min(100%, 760px); min-height: 100vh; margin: 0 auto; padding-bottom: 110px; }
+
+    .app { width: min(100%, 720px); margin: 0 auto; }
+
     .header {
-      padding: max(24px, env(safe-area-inset-top)) 20px 22px;
+      padding: max(22px, env(safe-area-inset-top)) 20px 20px;
       background: linear-gradient(135deg, #c93f79, #e96c9e);
       color: var(--white);
-      border-radius: 0 0 32px 32px;
+      border-radius: 0 0 30px 30px;
       box-shadow: var(--shadow);
     }
-    .eyebrow { margin: 0 0 6px; font-size: 0.82rem; font-weight: 700; opacity: 0.82; text-transform: uppercase; letter-spacing: 0.1em; }
-    .header h1 { margin: 0; font-size: clamp(1.65rem, 7vw, 2.3rem); }
-    .header p { margin: 8px 0 0; opacity: 0.9; }
-    main { padding: 18px 16px; }
-    .page { display: none; animation: fade 0.18s ease; }
+
+    .header small { display: block; margin-bottom: 5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.85; }
+    .header h1 { margin: 0; font-size: clamp(1.5rem, 6.5vw, 2.1rem); }
+
+    main { padding: 16px; }
+
+    .page { display: none; }
     .page.active { display: block; }
-    @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-    .section-title { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin: 12px 2px; }
-    .section-title h2 { margin: 0; font-size: 1.15rem; }
-    .section-title p { margin: 4px 0 0; color: var(--muted); font-size: 0.9rem; }
-    .card { padding: 18px; border: 1px solid var(--border); border-radius: var(--radius); background: rgba(255,255,255,0.96); box-shadow: var(--shadow); }
-    .income-card { display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: end; margin-bottom: 16px; }
-    .field { display: grid; gap: 7px; }
-    .field label { font-size: 0.85rem; font-weight: 700; color: var(--muted); }
+
+    .card {
+      margin-bottom: 14px;
+      padding: 17px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--white);
+      box-shadow: var(--shadow);
+    }
+
+    .card h2 { margin: 0 0 14px; font-size: 1.05rem; }
+    .card h2 span { color: var(--muted); font-weight: 600; font-size: 0.85rem; }
+
+    .field { display: grid; gap: 6px; }
+    .field label { font-size: 0.82rem; font-weight: 700; color: var(--muted); }
+
     input, select {
-      width: 100%; min-height: 48px; padding: 11px 13px; color: var(--text);
-      background: var(--white); border: 1px solid var(--border); border-radius: 14px; outline: none;
+      width: 100%;
+      min-height: 46px;
+      padding: 10px 12px;
+      color: var(--text);
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      outline: none;
     }
-    input:focus, select:focus { border-color: var(--pink); box-shadow: 0 0 0 3px rgba(217,79,135,0.12); }
-    .btn { min-height: 48px; padding: 11px 17px; border: 0; border-radius: 14px; font-weight: 800; transition: 0.18s ease; }
+
+    input:focus, select:focus { border-color: var(--pink); box-shadow: 0 0 0 3px rgba(217, 79, 135, 0.12); }
+
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .btn {
+      min-height: 46px;
+      padding: 10px 16px;
+      border: 0;
+      border-radius: 13px;
+      font-weight: 800;
+      transition: 0.15s ease;
+    }
+
     .btn:active { transform: scale(0.98); }
-    .btn-primary { color: var(--white); background: linear-gradient(135deg, var(--pink-dark), var(--pink)); box-shadow: 0 8px 18px rgba(217,79,135,0.24); }
+    .btn-primary { color: var(--white); background: linear-gradient(135deg, var(--pink-dark), var(--pink)); }
     .btn-secondary { color: var(--pink-dark); background: var(--pink-light); border: 1px solid var(--pink-soft); }
-    .summary-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-    .summary-card {
-      min-height: 128px; padding: 17px; overflow: hidden; position: relative;
-      border: 1px solid var(--border); border-radius: 20px; background: var(--white); box-shadow: var(--shadow);
+    .btn-wide { width: 100%; margin-top: 12px; }
+
+    .line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--border);
     }
-    .summary-card::after { content: ""; width: 76px; height: 76px; position: absolute; top: -28px; right: -25px; border-radius: 50%; background: var(--pink-light); }
-    .summary-card.total { grid-column: 1 / -1; color: var(--white); border: 0; background: linear-gradient(135deg, #b9366d, #e9699b); }
-    .summary-card.total::after { background: rgba(255,255,255,0.13); }
-    .summary-card.balance.negative strong { color: var(--danger); }
-    .summary-card span { display: block; position: relative; z-index: 1; margin-bottom: 16px; font-size: 0.82rem; color: var(--muted); font-weight: 700; }
-    .summary-card.total span { color: rgba(255,255,255,0.86); }
-    .summary-card strong { display: block; position: relative; z-index: 1; font-size: clamp(1.12rem, 5vw, 1.55rem); }
-    .quick-add { width: 100%; margin: 16px 0 4px; font-size: 1rem; }
-    .cards-list, .expense-list { display: grid; gap: 12px; }
-    .credit-card, .expense-item {
-      display: flex; justify-content: space-between; align-items: center; gap: 14px;
-      padding: 16px; border: 1px solid var(--border); border-radius: 18px;
-      background: var(--white); box-shadow: 0 8px 20px rgba(156,66,105,0.07);
+
+    .line:last-child { border-bottom: 0; padding-bottom: 0; }
+    .line .name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+    .line .name small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; }
+    .line .value { font-weight: 800; white-space: nowrap; }
+
+    .line input {
+      min-height: 40px;
+      padding: 7px 9px;
+      text-align: right;
+      font-weight: 700;
     }
-    .credit-card { color: var(--white); border: 0; background: linear-gradient(135deg, #643250, #d74b84); }
-    .credit-card small { display: block; margin-bottom: 5px; opacity: 0.76; }
-    .credit-card strong { font-size: 1.15rem; }
-    .card-actions, .expense-actions { display: flex; gap: 8px; }
-    .icon-btn { min-width: 42px; min-height: 42px; padding: 8px; border: 0; border-radius: 12px; color: var(--pink-dark); background: var(--pink-light); font-weight: 800; }
-    .credit-card .icon-btn { color: var(--white); background: rgba(255,255,255,0.16); }
-    .filters { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-    .filters .search { grid-column: 1 / -1; }
-    .expense-info { min-width: 0; flex: 1; }
-    .expense-name { margin: 0 0 5px; font-weight: 800; overflow-wrap: anywhere; }
-    .expense-meta { color: var(--muted); font-size: 0.82rem; line-height: 1.5; }
-    .expense-value { margin-bottom: 8px; text-align: right; color: var(--pink-dark); font-weight: 900; white-space: nowrap; }
-    .empty { padding: 34px 18px; color: var(--muted); text-align: center; border: 1px dashed var(--border); border-radius: 18px; background: rgba(255,255,255,0.65); }
-    .bottom-nav {
-      width: min(calc(100% - 20px), 740px); min-height: 72px; display: grid; grid-template-columns: repeat(4, 1fr);
-      gap: 4px; position: fixed; left: 50%; bottom: max(10px, env(safe-area-inset-bottom)); z-index: 30;
-      transform: translateX(-50%); padding: 8px; border: 1px solid var(--border); border-radius: 23px;
-      background: rgba(255,255,255,0.94); box-shadow: 0 16px 40px rgba(93,38,63,0.2); backdrop-filter: blur(14px);
+
+    .line .del {
+      min-width: 38px;
+      min-height: 38px;
+      border: 0;
+      border-radius: 11px;
+      color: var(--danger);
+      background: #fff0f3;
+      font-weight: 800;
     }
-    .nav-btn { display: grid; place-items: center; gap: 3px; padding: 8px 3px; color: var(--muted); border: 0; border-radius: 16px; background: transparent; font-size: 0.72rem; font-weight: 800; }
-    .nav-btn .nav-icon { font-size: 1.2rem; }
-    .nav-btn.active { color: var(--pink-dark); background: var(--pink-light); }
-    dialog { width: min(calc(100% - 24px), 560px); max-height: 88vh; padding: 0; color: var(--text); border: 0; border-radius: 25px; box-shadow: 0 25px 80px rgba(67,24,45,0.34); }
-    dialog::backdrop { background: rgba(59,31,45,0.54); backdrop-filter: blur(4px); }
-    .modal { max-height: 88vh; overflow-y: auto; padding: 20px; background: var(--white); }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 18px; }
-    .modal-header h2 { margin: 0; font-size: 1.25rem; }
-    .close-btn { width: 42px; height: 42px; border: 0; border-radius: 50%; color: var(--muted); background: var(--pink-light); font-size: 1.3rem; }
-    .form-grid { display: grid; gap: 14px; }
-    .form-actions { display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; margin-top: 19px; }
-    .hidden { display: none !important; }
-    .toast {
-      max-width: calc(100% - 32px); position: fixed; left: 50%; bottom: 100px; z-index: 100;
-      transform: translate(-50%, 20px); padding: 12px 18px; color: var(--white); background: #49333e;
-      border-radius: 14px; box-shadow: var(--shadow); opacity: 0; pointer-events: none; transition: 0.25s ease; text-align: center;
+
+    .group-title {
+      margin: 16px 0 4px;
+      color: var(--pink-dark);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
-    .toast.show { opacity: 1; transform: translate(-50%, 0); }
-    @media (min-width: 650px) {
-      main { padding: 24px; }
-      .summary-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-      .summary-card.total { grid-column: span 2; }
-      .summary-card.balance { grid-column: span 2; }
-      .form-grid.two-columns { grid-template-columns: 1fr 1fr; }
-      .form-grid.two-columns .full { grid-column: 1 / -1; }
+
+    .group-title:first-child { margin-top: 0; }
+
+    .result {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 12px;
+      padding: 15px 16px;
+      border-radius: 16px;
+      background: var(--pink-light);
     }
-    @media (max-width: 430px) {
-      .income-card { grid-template-columns: 1fr; }
-      .expense-item { align-items: flex-start; }
-      .expense-actions { flex-direction: column; }
+
+    .result span { font-size: 0.85rem; font-weight: 700; color: var(--muted); }
+    .result strong { font-size: 1.1rem; color: var(--pink-dark); }
+    .result.big { background: linear-gradient(135deg, #b9366d, #e9699b); }
+    .result.big span { color: rgba(255, 255, 255, 0.88); }
+    .result.big strong { color: var(--white); font-size: 1.45rem; }
+    .result.good strong { color: var(--success); }
+    .result.bad strong { color: var(--danger); }
+
+    .note { margin: 10px 0 0; color: var(--muted); font-size: 0.82rem; line-height: 1.55; }
+
+    .pill { display: inline-block; padding: 3px 9px; border-radius: 999px; background: var(--pink-soft); color: var(--pink-dark); font-size: 0.72rem; font-weight: 800; }
+
+    .nav {
+      width: min(calc(100% - 20px), 700px);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      position: fixed;
+      left: 50%;
+      bottom: max(10px, env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      padding: 7px;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 14px 36px rgba(93, 38, 63, 0.19);
+      backdrop-filter: blur(14px);
+      z-index: 20;
     }
+
+    .nav button {
+      display: grid;
+      place-items: center;
+      gap: 2px;
+      padding: 8px 2px;
+      border: 0;
+      border-radius: 15px;
+      color: var(--muted);
+      background: transparent;
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    .nav button i { font-size: 1.15rem; font-style: normal; }
+    .nav button.active { color: var(--pink-dark); background: var(--pink-light); }
+
+    .progress { height: 9px; margin-top: 10px; border-radius: 999px; background: var(--pink-soft); overflow: hidden; }
+    .progress div { height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, var(--pink-dark), var(--pink)); transition: width 0.3s ease; }
+
+    ul.tips { margin: 0; padding-left: 18px; color: var(--muted); font-size: 0.85rem; line-height: 1.7; }
+    ul.tips li { margin-bottom: 6px; }
   </style>
 </head>
 <body>
   <div class="app">
     <header class="header">
-      <p class="eyebrow">Meu dinheiro</p>
-      <h1>Controle financeiro</h1>
-      <p>Organize seus gastos com leveza.</p>
+      <small>Meu dinheiro</small>
+      <h1>Controle Financeiro</h1>
     </header>
 
     <main>
-      <section id="homePage" class="page active">
-        <div class="card income-card">
+      <section id="pageResumo" class="page active">
+        <div class="card">
+          <h2>Minha renda</h2>
           <div class="field">
-            <label for="income">Renda mensal</label>
-            <input id="income" type="number" min="0" step="0.01" placeholder="Ex.: 3500,00">
+            <label for="renda">Quanto você recebe por mês</label>
+            <input id="renda" type="number" inputmode="decimal" min="0" step="0.01" placeholder="2000,00">
           </div>
-          <button id="saveIncome" class="btn btn-secondary" type="button">Salvar renda</button>
+          <p class="note">Os valores abaixo se atualizam sozinhos a cada mudança.</p>
         </div>
 
-        <div class="summary-grid">
-          <article class="summary-card total">
-            <span>Total de gastos</span>
-            <strong id="totalExpenses">R$ 0,00</strong>
-          </article>
-          <article class="summary-card">
-            <span>Gastos fixos</span>
-            <strong id="fixedTotal">R$ 0,00</strong>
-          </article>
-          <article class="summary-card">
-            <span>Gastos variáveis</span>
-            <strong id="variableTotal">R$ 0,00</strong>
-          </article>
-          <article class="summary-card">
-            <span>Total nos cartões</span>
-            <strong id="cardsTotal">R$ 0,00</strong>
-          </article>
-          <article id="balanceCard" class="summary-card balance">
-            <span>Saldo restante</span>
-            <strong id="balance">Informe a renda</strong>
-          </article>
+        <div class="card">
+          <h2>Resumo do mês</h2>
+
+          <div class="line">
+            <span class="name">Gastos fixos</span>
+            <span class="value" id="sumFixos">R$ 0,00</span>
+          </div>
+          <div class="line">
+            <span class="name">Gastos variáveis</span>
+            <span class="value" id="sumVariaveis">R$ 0,00</span>
+          </div>
+          <div class="line">
+            <span class="name">Cartões / parcelas</span>
+            <span class="value" id="sumCartoes">R$ 0,00</span>
+          </div>
+          <div class="line">
+            <span class="name">Reserva + aposentadoria</span>
+            <span class="value" id="sumMetas">R$ 0,00</span>
+          </div>
+          <div class="line">
+            <span class="name"><strong>Total comprometido</strong></span>
+            <span class="value" id="sumTotal">R$ 0,00</span>
+          </div>
+
+          <div class="result big">
+            <span>Quanto sobra para o mês</span>
+            <strong id="sobra">R$ 0,00</strong>
+          </div>
+          <p class="note" id="sobraNota"></p>
         </div>
 
-        <button class="btn btn-primary quick-add" type="button" data-open-expense>+ Adicionar gasto</button>
-
-        <div class="section-title">
-          <div>
-            <h2>Resumo dos cartões</h2>
-            <p>Compras separadas por cartão</p>
+        <div class="card">
+          <h2>Quando as parcelas terminarem</h2>
+          <p class="note" id="alivioTexto"></p>
+          <div class="result">
+            <span>Sobra depois que as parcelas acabarem</span>
+            <strong id="sobraFutura">R$ 0,00</strong>
           </div>
         </div>
-        <div id="homeCardsList" class="cards-list"></div>
       </section>
 
-      <section id="expensesPage" class="page">
-        <div class="section-title">
-          <div>
-            <h2>Histórico</h2>
-            <p>Todos os seus lançamentos</p>
+      <section id="pageGastos" class="page">
+        <div class="card">
+          <h2>Gastos fixos <span>— todo mês</span></h2>
+          <div id="listaFixos"></div>
+
+          <div class="row-2" style="margin-top:12px">
+            <input id="novoFixo" type="text" maxlength="40" placeholder="Nome do gasto">
+            <input id="valorFixo" type="number" inputmode="decimal" step="0.01" placeholder="Valor">
           </div>
-          <button class="btn btn-primary" type="button" data-open-expense>+ Gasto</button>
+          <button class="btn btn-secondary btn-wide" data-add="fixos">+ Adicionar gasto fixo</button>
         </div>
 
-        <div class="filters">
-          <input id="searchExpense" class="search" type="search" placeholder="Buscar por descrição...">
-          <select id="filterType" aria-label="Filtrar por categoria">
-            <option value="">Todas as categorias</option>
-            <option value="fixed">Gastos fixos</option>
-            <option value="variable">Gastos variáveis</option>
-            <option value="card">Cartões</option>
-          </select>
-          <input id="filterMonth" type="month" aria-label="Filtrar por mês">
+        <div class="card">
+          <h2>Cartões e parcelas</h2>
+          <div id="listaCartoes"></div>
+
+          <div class="row-2" style="margin-top:12px">
+            <input id="novoCartao" type="text" maxlength="40" placeholder="Ex.: parcela da TV">
+            <input id="valorCartao" type="number" inputmode="decimal" step="0.01" placeholder="Valor">
+          </div>
+          <button class="btn btn-secondary btn-wide" data-add="cartoes">+ Adicionar cartão</button>
         </div>
-        <div id="expenseList" class="expense-list"></div>
+
+        <div class="card">
+          <h2>Gastos variáveis <span>— mudam no mês</span></h2>
+          <div id="listaVariaveis"></div>
+
+          <div class="row-2" style="margin-top:12px">
+            <input id="novoVariavel" type="text" maxlength="40" placeholder="Ex.: mercado, saída">
+            <input id="valorVariavel" type="number" inputmode="decimal" step="0.01" placeholder="Valor">
+          </div>
+          <button class="btn btn-secondary btn-wide" data-add="variaveis">+ Adicionar gasto variável</button>
+        </div>
       </section>
 
-      <section id="cardsPage" class="page">
-        <div class="section-title">
-          <div>
-            <h2>Meus cartões</h2>
-            <p>Cadastre e acompanhe cada cartão</p>
-          </div>
-          <button id="openCardModal" class="btn btn-primary" type="button">+ Cartão</button>
-        </div>
-        <div id="cardsList" class="cards-list"></div>
-      </section>
+      <section id="pageMetas" class="page">
+        <div class="card">
+          <h2>Minhas metas</h2>
 
-      <section id="categoriesPage" class="page">
-        <div class="section-title">
-          <div>
-            <h2>Por categoria</h2>
-            <p>Distribuição dos gastos no mês selecionado</p>
+          <div class="group-title">Todo mês eu guardo</div>
+          <div class="line">
+            <span class="name">Reserva de emergência</span>
+            <input id="metaReserva" type="number" inputmode="decimal" step="1" value="100">
+          </div>
+          <div class="line">
+            <span class="name">Caixinha da aposentadoria</span>
+            <input id="metaAposentadoria" type="number" inputmode="decimal" step="1" value="50">
+          </div>
+          <div class="line">
+            <span class="name">Meu valor pessoal <small>creme, saída, cuidado</small></span>
+            <input id="metaPessoal" type="number" inputmode="decimal" step="1" value="84">
           </div>
         </div>
-        <div id="categorySummary" class="cards-list"></div>
+
+        <div class="card">
+          <h2>Reserva de emergência</h2>
+          <div class="field">
+            <label for="reservaAtual">Quanto você já tem guardado</label>
+            <input id="reservaAtual" type="number" inputmode="decimal" step="1" value="0">
+          </div>
+
+          <div class="result">
+            <span>Meta de R$ 1.000</span>
+            <strong id="reservaFalta">Faltam R$ 1.000</strong>
+          </div>
+          <div class="progress"><div id="reservaBarra"></div></div>
+          <p class="note" id="reservaTempo"></p>
+        </div>
+
+        <div class="card">
+          <h2>Plano do mês</h2>
+          <p class="note">Este é o caminho sugerido para o seu caso: primeiro montar a reserva, depois investir na aposentadoria.</p>
+          <ul class="tips" id="planoLista"></ul>
+        </div>
       </section>
     </main>
 
-    <nav class="bottom-nav" aria-label="Navegação principal">
-      <button class="nav-btn active" type="button" data-page="homePage"><span class="nav-icon">⌂</span><span>Início</span></button>
-      <button class="nav-btn" type="button" data-page="expensesPage"><span class="nav-icon">≡</span><span>Histórico</span></button>
-      <button class="nav-btn" type="button" data-page="cardsPage"><span class="nav-icon">▣</span><span>Cartões</span></button>
-      <button class="nav-btn" type="button" data-page="categoriesPage"><span class="nav-icon">◷</span><span>Categorias</span></button>
+    <nav class="nav">
+      <button class="active" data-page="pageResumo"><i>⌂</i>Resumo</button>
+      <button data-page="pageGastos"><i>≡</i>Gastos</button>
+      <button data-page="pageMetas"><i>◷</i>Metas</button>
     </nav>
   </div>
 
-  <dialog id="expenseDialog">
-    <form id="expenseForm" class="modal">
-      <div class="modal-header">
-        <h2 id="expenseModalTitle">Adicionar gasto</h2>
-        <button class="close-btn" type="button" data-close-dialog>×</button>
-      </div>
-
-      <input id="expenseId" type="hidden">
-
-      <div class="form-grid two-columns">
-        <div class="field full">
-          <label for="description">Descrição</label>
-          <input id="description" type="text" required maxlength="80" placeholder="Ex.: Internet, mercado...">
-        </div>
-        <div class="field">
-          <label for="amount">Valor</label>
-          <input id="amount" type="number" required min="0.01" step="0.01" placeholder="0,00">
-        </div>
-        <div class="field">
-          <label for="date">Data</label>
-          <input id="date" type="date" required>
-        </div>
-        <div class="field">
-          <label for="type">Categoria principal</label>
-          <select id="type" required>
-            <option value="fixed">Gasto fixo</option>
-            <option value="variable">Gasto variável</option>
-            <option value="card">Cartão</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="subcategory">Tipo de gasto</label>
-          <select id="subcategory" required></select>
-        </div>
-        <div class="field">
-          <label for="paymentMethod">Forma de pagamento</label>
-          <select id="paymentMethod" required>
-            <option value="Pix">Pix</option>
-            <option value="Dinheiro">Dinheiro</option>
-            <option value="Débito">Débito</option>
-            <option value="Boleto">Boleto</option>
-            <option value="Transferência">Transferência</option>
-            <option value="Crédito">Crédito</option>
-          </select>
-        </div>
-        <div id="cardField" class="field hidden">
-          <label for="cardId">Cartão utilizado</label>
-          <select id="cardId"></select>
-        </div>
-      </div>
-
-      <div class="form-actions">
-        <button class="btn btn-secondary" type="button" data-close-dialog>Cancelar</button>
-        <button class="btn btn-primary" type="submit">Salvar gasto</button>
-      </div>
-    </form>
-  </dialog>
-
-  <dialog id="cardDialog">
-    <form id="cardForm" class="modal">
-      <div class="modal-header">
-        <h2 id="cardModalTitle">Adicionar cartão</h2>
-        <button class="close-btn" type="button" data-close-card>×</button>
-      </div>
-
-      <input id="editCardId" type="hidden">
-
-      <div class="field">
-        <label for="cardName">Nome do cartão</label>
-        <input id="cardName" type="text" required maxlength="40" placeholder="Ex.: Cartão Nubank">
-      </div>
-
-      <div class="form-actions">
-        <button class="btn btn-secondary" type="button" data-close-card>Cancelar</button>
-        <button class="btn btn-primary" type="submit">Salvar cartão</button>
-      </div>
-    </form>
-  </dialog>
-
-  <div id="toast" class="toast" role="status"></div>
-
   <script>
-    const STORAGE_KEY = "controleFinanceiroRosa_v1";
+    var CHAVE = "controleRosa_v2";
 
-    const subcategories = {
-      fixed: ["Financiamento", "Energia", "Internet", "Transporte", "Alimentação", "Faculdade/pós", "Outros"],
-      variable: ["Alimentação fora", "Compras", "Lazer", "Beleza", "Delivery", "Outros"],
-      card: ["Alimentação", "Compras", "Lazer", "Beleza", "Delivery", "Transporte", "Outros"]
-    };
-
-    const typeLabels = { fixed: "Gasto fixo", variable: "Gasto variável", card: "Cartão" };
-
-    function newId() {
-      if (window.crypto && typeof crypto.randomUUID === "function") return crypto.randomUUID();
-      return "id-" + Date.now() + "-" + Math.random().toString(16).slice(2);
-    }
-
-    const defaultState = () => ({
-      income: null,
-      cards: [
-        { id: newId(), name: "Cartão Caixa" },
-        { id: newId(), name: "Cartão Nubank" },
-        { id: newId(), name: "Cartão Inter" }
+    var modelo = {
+      renda: 2000,
+      fixos: [
+        { id: "f1", nome: "Financiamento do prive", valor: 385 },
+        { id: "f2", nome: "Feira", valor: 400 },
+        { id: "f3", nome: "Pós-graduação", valor: 175 },
+        { id: "f4", nome: "Plano de saúde", valor: 276 },
+        { id: "f5", nome: "Transporte", valor: 100 },
+        { id: "f6", nome: "Energia", valor: 100 }
       ],
-      expenses: []
-    });
-
-    let state = loadState();
-
-    const elements = {
-      income: document.querySelector("#income"),
-      saveIncome: document.querySelector("#saveIncome"),
-      totalExpenses: document.querySelector("#totalExpenses"),
-      fixedTotal: document.querySelector("#fixedTotal"),
-      variableTotal: document.querySelector("#variableTotal"),
-      cardsTotal: document.querySelector("#cardsTotal"),
-      balance: document.querySelector("#balance"),
-      balanceCard: document.querySelector("#balanceCard"),
-      homeCardsList: document.querySelector("#homeCardsList"),
-      cardsList: document.querySelector("#cardsList"),
-      expenseList: document.querySelector("#expenseList"),
-      categorySummary: document.querySelector("#categorySummary"),
-      searchExpense: document.querySelector("#searchExpense"),
-      filterType: document.querySelector("#filterType"),
-      filterMonth: document.querySelector("#filterMonth"),
-      expenseDialog: document.querySelector("#expenseDialog"),
-      expenseForm: document.querySelector("#expenseForm"),
-      expenseModalTitle: document.querySelector("#expenseModalTitle"),
-      expenseId: document.querySelector("#expenseId"),
-      description: document.querySelector("#description"),
-      amount: document.querySelector("#amount"),
-      date: document.querySelector("#date"),
-      type: document.querySelector("#type"),
-      subcategory: document.querySelector("#subcategory"),
-      paymentMethod: document.querySelector("#paymentMethod"),
-      cardField: document.querySelector("#cardField"),
-      cardId: document.querySelector("#cardId"),
-      cardDialog: document.querySelector("#cardDialog"),
-      cardForm: document.querySelector("#cardForm"),
-      cardModalTitle: document.querySelector("#cardModalTitle"),
-      editCardId: document.querySelector("#editCardId"),
-      cardName: document.querySelector("#cardName"),
-      toast: document.querySelector("#toast")
+      cartoes: [
+        { id: "c1", nome: "Plano do celular", valor: 30 },
+        { id: "c2", nome: "Máquina de lavar (10x)", valor: 150 },
+        { id: "c3", nome: "TV (10x)", valor: 150 }
+      ],
+      variaveis: [
+        { id: "v1", nome: "Creme e desodorante", valor: 40 },
+        { id: "v2", nome: "Uma saída no mês", valor: 44 }
+      ],
+      metas: { reserva: 100, aposentadoria: 50, pessoal: 84 },
+      reservaAtual: 0
     };
 
-    function loadState() {
+    var dados = carregar();
+
+    var el = {
+      renda: document.getElementById("renda"),
+      sumFixos: document.getElementById("sumFixos"),
+      sumVariaveis: document.getElementById("sumVariaveis"),
+      sumCartoes: document.getElementById("sumCartoes"),
+      sumMetas: document.getElementById("sumMetas"),
+      sumTotal: document.getElementById("sumTotal"),
+      sobra: document.getElementById("sobra"),
+      sobraNota: document.getElementById("sobraNota"),
+      alivioTexto: document.getElementById("alivioTexto"),
+      sobraFutura: document.getElementById("sobraFutura"),
+      listaFixos: document.getElementById("listaFixos"),
+      listaCartoes: document.getElementById("listaCartoes"),
+      listaVariaveis: document.getElementById("listaVariaveis"),
+      metaReserva: document.getElementById("metaReserva"),
+      metaAposentadoria: document.getElementById("metaAposentadoria"),
+      metaPessoal: document.getElementById("metaPessoal"),
+      reservaAtual: document.getElementById("reservaAtual"),
+      reservaFalta: document.getElementById("reservaFalta"),
+      reservaBarra: document.getElementById("reservaBarra"),
+      reservaTempo: document.getElementById("reservaTempo"),
+      planoLista: document.getElementById("planoLista")
+    };
+
+    function carregar() {
       try {
-        const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
-        if (!stored) return defaultState();
-        return {
-          income: stored.income === null || stored.income === undefined ? null : Number(stored.income),
-          cards: Array.isArray(stored.cards) ? stored.cards : [],
-          expenses: Array.isArray(stored.expenses) ? stored.expenses : []
-        };
-      } catch (error) {
-        return defaultState();
+        var salvo = JSON.parse(localStorage.getItem(CHAVE));
+        if (!salvo) return JSON.parse(JSON.stringify(modelo));
+        return mesclar(salvo);
+      } catch (e) {
+        return JSON.parse(JSON.stringify(modelo));
       }
     }
 
-    function saveState() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      renderAll();
-    }
-
-    function formatMoney(value) {
-      return Number(value || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-    }
-
-    function formatDate(dateString) {
-      if (!dateString) return "";
-      return new Intl.DateTimeFormat("pt-BR").format(new Date(dateString + "T12:00:00"));
-    }
-
-    function today() {
-      const date = new Date();
-      const offset = date.getTimezoneOffset();
-      return new Date(date.getTime() - offset * 60000).toISOString().slice(0, 10);
-    }
-
-    function currentMonth() {
-      return today().slice(0, 7);
-    }
-
-    function selectedMonthExpenses() {
-      const month = elements.filterMonth.value || currentMonth();
-      return state.expenses.filter(expense => expense.date.indexOf(month) === 0);
-    }
-
-    function sumExpenses(expenses) {
-      return expenses.reduce((total, expense) => total + Number(expense.amount), 0);
-    }
-
-    function cardName(cardId) {
-      const card = state.cards.find(item => item.id === cardId);
-      return card ? card.name : "Cartão removido";
-    }
-
-    function escapeHtml(value) {
-      return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
-    function showToast(message) {
-      elements.toast.textContent = message;
-      elements.toast.classList.add("show");
-      clearTimeout(showToast.timer);
-      showToast.timer = setTimeout(() => elements.toast.classList.remove("show"), 2200);
-    }
-
-    function fillSubcategories(selectedValue) {
-      const items = subcategories[elements.type.value];
-      elements.subcategory.innerHTML = items.map(item =>
-        '<option value="' + escapeHtml(item) + '">' + escapeHtml(item) + '</option>'
-      ).join("");
-      if (selectedValue && items.indexOf(selectedValue) !== -1) elements.subcategory.value = selectedValue;
-    }
-
-    function fillCardOptions(selectedId) {
-      if (state.cards.length) {
-        elements.cardId.innerHTML = state.cards.map(card =>
-          '<option value="' + card.id + '">' + escapeHtml(card.name) + '</option>'
-        ).join("");
-      } else {
-        elements.cardId.innerHTML = '<option value="">Cadastre um cartão primeiro</option>';
-      }
-      if (selectedId) elements.cardId.value = selectedId;
-    }
-
-    function updateExpenseFields() {
-      const isCard = elements.type.value === "card";
-      elements.cardField.classList.toggle("hidden", !isCard);
-      elements.cardId.required = isCard;
-      if (isCard) elements.paymentMethod.value = "Crédito";
-      fillSubcategories();
-      fillCardOptions();
-    }
-
-    function renderSummary() {
-      const monthly = selectedMonthExpenses();
-      const fixed = monthly.filter(item => item.type === "fixed");
-      const variable = monthly.filter(item => item.type === "variable");
-      const cards = monthly.filter(item => item.type === "card");
-      const total = sumExpenses(monthly);
-
-      elements.totalExpenses.textContent = formatMoney(total);
-      elements.fixedTotal.textContent = formatMoney(sumExpenses(fixed));
-      elements.variableTotal.textContent = formatMoney(sumExpenses(variable));
-      elements.cardsTotal.textContent = formatMoney(sumExpenses(cards));
-
-      if (state.income === null) {
-        elements.balance.textContent = "Informe a renda";
-        elements.balanceCard.classList.remove("negative");
-      } else {
-        const balance = Number(state.income) - total;
-        elements.balance.textContent = formatMoney(balance);
-        elements.balanceCard.classList.toggle("negative", balance < 0);
-      }
-
-      elements.income.value = state.income === null ? "" : state.income;
-    }
-
-    function renderHomeCards() {
-      const monthlyCards = selectedMonthExpenses().filter(item => item.type === "card");
-
-      if (!state.cards.length) {
-        elements.homeCardsList.innerHTML = '<div class="empty">Nenhum cartão cadastrado.</div>';
-        return;
-      }
-
-      elements.homeCardsList.innerHTML = state.cards.map(card => {
-        const total = sumExpenses(monthlyCards.filter(item => item.cardId === card.id));
-        return '<article class="credit-card"><div><small>' + escapeHtml(card.name) +
-          '</small><strong>' + formatMoney(total) + '</strong></div><span aria-hidden="true">◈</span></article>';
-      }).join("");
-    }
-
-    function renderCards() {
-      if (!state.cards.length) {
-        elements.cardsList.innerHTML = '<div class="empty">Você ainda não cadastrou cartões.</div>';
-        return;
-      }
-
-      const monthly = selectedMonthExpenses();
-
-      elements.cardsList.innerHTML = state.cards.map(card => {
-        const total = sumExpenses(monthly.filter(item => item.type === "card" && item.cardId === card.id));
-        return '<article class="credit-card"><div><small>' + escapeHtml(card.name) +
-          '</small><strong>' + formatMoney(total) + '</strong></div><div class="card-actions">' +
-          '<button class="icon-btn" type="button" data-edit-card="' + card.id + '" aria-label="Editar cartão">✎</button>' +
-          '<button class="icon-btn" type="button" data-delete-card="' + card.id + '" aria-label="Excluir cartão">×</button>' +
-          '</div></article>';
-      }).join("");
-    }
-
-    function renderExpenses() {
-      const search = elements.searchExpense.value.trim().toLowerCase();
-      const type = elements.filterType.value;
-      const month = elements.filterMonth.value;
-
-      const filtered = state.expenses.filter(expense => {
-        const matchesSearch =
-          expense.description.toLowerCase().indexOf(search) !== -1 ||
-          expense.subcategory.toLowerCase().indexOf(search) !== -1;
-        const matchesType = !type || expense.type === type;
-        const matchesMonth = !month || expense.date.indexOf(month) === 0;
-        return matchesSearch && matchesType && matchesMonth;
-      }).sort((a, b) => {
-        if (a.date !== b.date) return a.date < b.date ? 1 : -1;
-        return a.createdAt < b.createdAt ? 1 : -1;
+    function mesclar(salvo) {
+      var base = JSON.parse(JSON.stringify(modelo));
+      base.renda = typeof salvo.renda === "number" ? salvo.renda : base.renda;
+      ["fixos", "cartoes", "variaveis"].forEach(function (grupo) {
+        if (Array.isArray(salvo[grupo])) base[grupo] = salvo[grupo];
       });
-
-      if (!filtered.length) {
-        elements.expenseList.innerHTML = '<div class="empty">Nenhum gasto encontrado.</div>';
-        return;
-      }
-
-      elements.expenseList.innerHTML = filtered.map(expense => {
-        const cardText = expense.type === "card" ? " · " + escapeHtml(cardName(expense.cardId)) : "";
-        return '<article class="expense-item"><div class="expense-info">' +
-          '<p class="expense-name">' + escapeHtml(expense.description) + '</p>' +
-          '<div class="expense-meta">' + escapeHtml(typeLabels[expense.type]) + " · " +
-          escapeHtml(expense.subcategory) + cardText + '<br>' + formatDate(expense.date) + " · " +
-          escapeHtml(expense.paymentMethod) + '</div></div><div><div class="expense-value">' +
-          formatMoney(expense.amount) + '</div><div class="expense-actions">' +
-          '<button class="icon-btn" type="button" data-edit-expense="' + expense.id + '" aria-label="Editar gasto">✎</button>' +
-          '<button class="icon-btn" type="button" data-delete-expense="' + expense.id + '" aria-label="Excluir gasto">×</button>' +
-          '</div></div></article>';
-      }).join("");
+      if (salvo.metas) base.metas = salvo.metas;
+      if (typeof salvo.reservaAtual === "number") base.reservaAtual = salvo.reservaAtual;
+      return base;
     }
 
-    function renderCategorySummary() {
-      const monthly = selectedMonthExpenses();
+    function salvar() {
+      localStorage.setItem(CHAVE, JSON.stringify(dados));
+      calcular();
+    }
 
-      if (!monthly.length) {
-        elements.categorySummary.innerHTML = '<div class="empty">Ainda não existem gastos neste mês.</div>';
+    function moeda(v) {
+      return Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    }
+
+    function novoId() {
+      return "x" + Date.now() + Math.random().toString(16).slice(2, 7);
+    }
+
+    function soma(lista) {
+      return lista.reduce(function (t, item) { return t + Number(item.valor || 0); }, 0);
+    }
+
+    function linhaHtml(item, grupo) {
+      return '<div class="line" data-item="' + item.id + '" data-grupo="' + grupo + '">' +
+        '<input type="text" value="' + String(item.nome).replace(/"/g, "&quot;") + '" data-campo="nome" aria-label="Nome">' +
+        '<input type="number" inputmode="decimal" step="0.01" value="' + item.valor + '" data-campo="valor" style="max-width:110px" aria-label="Valor">' +
+        '<button class="del" type="button" data-del="1" aria-label="Excluir">×</button>' +
+      '</div>';
+    }
+
+    function desenharLista(grupo, destino) {
+      if (!dados[grupo].length) {
+        destino.innerHTML = '<p class="note">Nada aqui ainda. Adicione algo abaixo.</p>';
         return;
       }
+      destino.innerHTML = dados[grupo].map(function (item) { return linhaHtml(item, grupo); }).join("");
+    }
 
-      const groups = [
-        { label: "Gastos fixos", total: sumExpenses(monthly.filter(item => item.type === "fixed")) },
-        { label: "Gastos variáveis", total: sumExpenses(monthly.filter(item => item.type === "variable")) },
-        { label: "Cartões", total: sumExpenses(monthly.filter(item => item.type === "card")) }
-      ];
+    function ehParcela(nome) {
+      return /parcela|\dx|x\d/i.test(nome);
+    }
 
-      const subTotals = {};
-      monthly.forEach(expense => {
-        subTotals[expense.subcategory] = (subTotals[expense.subcategory] || 0) + Number(expense.amount);
+    function calcular() {
+      var fixos = soma(dados.fixos);
+      var variaveis = soma(dados.variaveis);
+      var cartoes = soma(dados.cartoes);
+      var metas = Number(dados.metas.reserva || 0) + Number(dados.metas.aposentadoria || 0);
+
+      var total = fixos + variaveis + cartoes + metas;
+      var sobra = Number(dados.renda || 0) - total;
+
+      el.sumFixos.textContent = moeda(fixos);
+      el.sumVariaveis.textContent = moeda(variaveis);
+      el.sumCartoes.textContent = moeda(cartoes);
+      el.sumMetas.textContent = moeda(metas);
+      el.sumTotal.textContent = moeda(total);
+      el.sobra.textContent = moeda(sobra);
+
+      el.sobra.className = "result big";
+      if (sobra < 0) {
+        el.sobraNota.textContent = "Você está gastando mais do que recebe. Reduza algo antes de continuar.";
+        el.sobra.className = "result big bad";
+      } else if (sobra < 50) {
+        el.sobraNota.textContent = "A sobra está muito pequena. Qualquer imprevisto viraria dívida.";
+      } else {
+        el.sobraNota.textContent = "Está sobrando " + moeda(sobra) + " no mês. Guarde uma parte antes de gastar.";
+      }
+
+      var parcelas = dados.cartoes.filter(function (item) { return ehParcela(item.nome); });
+      var fimParcelas = soma(parcelas);
+      var sobraFutura = sobra + fimParcelas;
+
+      if (parcelas.length) {
+        el.alivioTexto.textContent = "Você paga " + moeda(fimParcelas) + " em parcelas (" +
+          parcelas.map(function (p) { return p.nome; }).join(", ") +
+          "). Quando terminarem, esse valor fica livre. O caminho é mandar esse dinheiro direto para a reserva, sem aumentar o padrão de vida.";
+      } else {
+        el.alivioTexto.textContent = "Você não tem parcelas em andamento.";
+      }
+      el.sobraFutura.textContent = moeda(sobraFutura);
+
+      var reserva = Number(dados.metas.reserva || 0);
+      var falta = Math.max(0, 1000 - Number(dados.reservaAtual || 0));
+      var pct = Math.min(100, (Number(dados.reservaAtual || 0) / 1000) * 100);
+
+      el.reservaFalta.textContent = falta > 0 ? "Faltam " + moeda(falta) : "Meta atingida!";
+      el.reservaBarra.style.width = pct + "%";
+
+      if (falta <= 0) {
+        el.reservaTempo.textContent = "Reserva completa. A partir daqui, sua contribuição pode ir para a aposentadoria.";
+      } else if (reserva <= 0) {
+        el.reservaTempo.textContent = "Defina um valor mensal na sua meta para ver em quanto tempo você chega lá.";
+      } else {
+        var meses = Math.ceil(falta / reserva);
+        el.reservaTempo.textContent = "Guardando " + moeda(reserva) +
+          " por mês, você chega em R$ 1.000 em " + meses +
+          (meses === 1 ? " mês." : " meses.");
+      }
+
+      el.planoLista.innerHTML = [
+        "Comece pela reserva de emergência: " + moeda(reserva) + " por mês até chegar a R$ 1.000.",
+        "Quando a reserva estiver pronta, comece a aposentadoria: " + moeda(Number(dados.metas.aposentadoria || 0)) + " por mês.",
+        "Separe " + moeda(Number(dados.metas.pessoal || 0)) + " para você: creme, desodorante e uma saída. Isso não é supérfluo, é o que sustenta o controle.",
+        "Nos meses em que as parcelas acabarem, mande o valor extra direto para a reserva.",
+        "Nunca pague o mínimo do cartão para sobrar agora — isso devolve o problema multiplicado no mês seguinte."
+      ].map(function (t) { return "<li>" + t + "</li>"; }).join("");
+    }
+
+    function renderTudo() {
+      el.renda.value = dados.renda;
+      el.metaReserva.value = dados.metas.reserva;
+      el.metaAposentadoria.value = dados.metas.aposentadoria;
+      el.metaPessoal.value = dados.metas.pessoal;
+      el.reservaAtual.value = dados.reservaAtual;
+      desenharLista("fixos", el.listaFixos);
+      desenharLista("cartoes", el.listaCartoes);
+      desenharLista("variaveis", el.listaVariaveis);
+      calcular();
+    }
+
+    el.renda.addEventListener("input", function () {
+      dados.renda = Number(el.renda.value || 0);
+      salvar();
+    });
+
+    [["metaReserva", "reserva"], ["metaAposentadoria", "aposentadoria"], ["metaPessoal", "pessoal"]].forEach(function (par) {
+      el[par[0]].addEventListener("input", function () {
+        dados.metas[par[1]] = Number(el[par[0]].value || 0);
+        salvar();
       });
-
-      const detailed = Object.keys(subTotals)
-        .map(label => ({ label: label, total: subTotals[label] }))
-        .sort((a, b) => b.total - a.total);
-
-      const items = groups.concat(detailed);
-
-      elements.categorySummary.innerHTML = items.map(item =>
-        '<article class="card"><div style="display:flex;justify-content:space-between;gap:16px;align-items:center">' +
-        '<span>' + escapeHtml(item.label) + '</span><strong style="color:var(--pink-dark)">' +
-        formatMoney(item.total) + '</strong></div></article>'
-      ).join("");
-    }
-
-    function renderAll() {
-      renderSummary();
-      renderHomeCards();
-      renderCards();
-      renderExpenses();
-      renderCategorySummary();
-      fillCardOptions();
-    }
-
-    function openExpenseModal(expense) {
-      elements.expenseForm.reset();
-      elements.expenseId.value = "";
-      elements.expenseModalTitle.textContent = expense ? "Editar gasto" : "Adicionar gasto";
-
-      if (expense) {
-        elements.expenseId.value = expense.id;
-        elements.description.value = expense.description;
-        elements.amount.value = expense.amount;
-        elements.date.value = expense.date;
-        elements.type.value = expense.type;
-        fillSubcategories(expense.subcategory);
-        elements.paymentMethod.value = expense.paymentMethod;
-        fillCardOptions(expense.cardId || "");
-      } else {
-        elements.date.value = today();
-        elements.type.value = "fixed";
-        elements.paymentMethod.value = "Pix";
-        fillSubcategories();
-        fillCardOptions();
-      }
-
-      const isCard = elements.type.value === "card";
-      elements.cardField.classList.toggle("hidden", !isCard);
-      elements.cardId.required = isCard;
-
-      elements.expenseDialog.showModal();
-      setTimeout(() => elements.description.focus(), 50);
-    }
-
-    function openCardModal(card) {
-      elements.cardForm.reset();
-      elements.editCardId.value = "";
-      elements.cardModalTitle.textContent = card ? "Editar cartão" : "Adicionar cartão";
-      if (card) {
-        elements.editCardId.value = card.id;
-        elements.cardName.value = card.name;
-      }
-      elements.cardDialog.showModal();
-      setTimeout(() => elements.cardName.focus(), 50);
-    }
-
-    elements.saveIncome.addEventListener("click", () => {
-      const value = elements.income.value;
-      state.income = value === "" ? null : Math.max(0, Number(value));
-      saveState();
-      showToast("Renda salva.");
     });
 
-    elements.expenseForm.addEventListener("submit", event => {
-      event.preventDefault();
+    el.reservaAtual.addEventListener("input", function () {
+      dados.reservaAtual = Number(el.reservaAtual.value || 0);
+      salvar();
+    });
 
-      if (elements.type.value === "card" && !state.cards.length) {
-        showToast("Cadastre um cartão antes de lançar a compra.");
+    document.addEventListener("input", function (evento) {
+      var campo = evento.target.closest("[data-campo]");
+      if (!campo) return;
+      var linha = campo.closest("[data-item]");
+      var grupo = linha.dataset.grupo;
+      var item = dados[grupo].filter(function (i) { return i.id === linha.dataset.item; })[0];
+      if (!item) return;
+
+      if (campo.dataset.campo === "nome") item.nome = campo.value;
+      if (campo.dataset.campo === "valor") item.valor = Number(campo.value || 0);
+      salvar();
+    });
+
+    document.addEventListener("click", function (evento) {
+      var botaoDel = evento.target.closest("[data-del]");
+      if (botaoDel) {
+        var linha = botaoDel.closest("[data-item]");
+        var grupo = linha.dataset.grupo;
+        dados[grupo] = dados[grupo].filter(function (i) { return i.id !== linha.dataset.item; });
+        salvar();
+        renderTudo();
         return;
       }
 
-      const id = elements.expenseId.value;
-      const existing = state.expenses.find(item => item.id === id);
+      var botaoAdd = evento.target.closest("[data-add]");
+      if (botaoAdd) {
+        var g = botaoAdd.dataset.add;
+        var campos = {
+          fixos: ["novoFixo", "valorFixo"],
+          cartoes: ["novoCartao", "valorCartao"],
+          variaveis: ["novoVariavel", "valorVariavel"]
+        }[g];
 
-      const expense = {
-        id: id || newId(),
-        description: elements.description.value.trim(),
-        amount: Number(elements.amount.value),
-        date: elements.date.value,
-        type: elements.type.value,
-        subcategory: elements.subcategory.value,
-        paymentMethod: elements.paymentMethod.value,
-        cardId: elements.type.value === "card" ? elements.cardId.value : null,
-        createdAt: existing ? existing.createdAt : new Date().toISOString()
-      };
+        var nome = document.getElementById(campos[0]).value.trim();
+        var valor = Number(document.getElementById(campos[1]).value || 0);
+        if (!nome) { alert("Escreva o nome do gasto."); return; }
 
-      if (id) {
-        state.expenses = state.expenses.map(item => item.id === id ? expense : item);
-      } else {
-        state.expenses.push(expense);
+        dados[g].push({ id: novoId(), nome: nome, valor: valor });
+        document.getElementById(campos[0]).value = "";
+        document.getElementById(campos[1]).value = "";
+        salvar();
+        renderTudo();
       }
-
-      saveState();
-      elements.expenseDialog.close();
-      showToast(id ? "Gasto atualizado." : "Gasto adicionado.");
     });
 
-    elements.cardForm.addEventListener("submit", event => {
-      event.preventDefault();
-      const id = elements.editCardId.value;
-      const name = elements.cardName.value.trim();
-
-      if (id) {
-        state.cards = state.cards.map(card => card.id === id ? { id: card.id, name: name } : card);
-      } else {
-        state.cards.push({ id: newId(), name: name });
-      }
-
-      saveState();
-      elements.cardDialog.close();
-      showToast(id ? "Cartão atualizado." : "Cartão adicionado.");
-    });
-
-    elements.type.addEventListener("change", updateExpenseFields);
-    elements.searchExpense.addEventListener("input", renderExpenses);
-    elements.filterType.addEventListener("change", renderExpenses);
-    elements.filterMonth.addEventListener("change", renderAll);
-
-    document.querySelectorAll("[data-open-expense]").forEach(button => {
-      button.addEventListener("click", () => openExpenseModal(null));
-    });
-
-    document.querySelector("#openCardModal").addEventListener("click", () => openCardModal(null));
-
-    document.querySelectorAll("[data-close-dialog]").forEach(button => {
-      button.addEventListener("click", () => elements.expenseDialog.close());
-    });
-
-    document.querySelectorAll("[data-close-card]").forEach(button => {
-      button.addEventListener("click", () => elements.cardDialog.close());
-    });
-
-    document.querySelectorAll(".nav-btn").forEach(button => {
-      button.addEventListener("click", () => {
-        document.querySelectorAll(".nav-btn").forEach(item => item.classList.toggle("active", item === button));
-        document.querySelectorAll(".page").forEach(page => page.classList.toggle("active", page.id === button.dataset.page));
+    document.querySelectorAll(".nav button").forEach(function (botao) {
+      botao.addEventListener("click", function () {
+        document.querySelectorAll(".nav button").forEach(function (b) {
+          b.classList.toggle("active", b === botao);
+        });
+        document.querySelectorAll(".page").forEach(function (p) {
+          p.classList.toggle("active", p.id === botao.dataset.page);
+        });
         window.scrollTo({ top: 0, behavior: "smooth" });
       });
     });
 
-    document.addEventListener("click", event => {
-      const editExpenseButton = event.target.closest("[data-edit-expense]");
-      const deleteExpenseButton = event.target.closest("[data-delete-expense]");
-      const editCardButton = event.target.closest("[data-edit-card]");
-      const deleteCardButton = event.target.closest("[data-delete-card]");
-
-      if (editExpenseButton) {
-        const expense = state.expenses.find(item => item.id === editExpenseButton.dataset.editExpense);
-        if (expense) openExpenseModal(expense);
-      }
-
-      if (deleteExpenseButton) {
-        const id = deleteExpenseButton.dataset.deleteExpense;
-        const expense = state.expenses.find(item => item.id === id);
-        if (expense && confirm('Excluir o gasto "' + expense.description + '"?')) {
-          state.expenses = state.expenses.filter(item => item.id !== id);
-          saveState();
-          showToast("Gasto excluído.");
-        }
-      }
-
-      if (editCardButton) {
-        const card = state.cards.find(item => item.id === editCardButton.dataset.editCard);
-        if (card) openCardModal(card);
-      }
-
-      if (deleteCardButton) {
-        const id = deleteCardButton.dataset.deleteCard;
-        const card = state.cards.find(item => item.id === id);
-        const hasExpenses = state.expenses.some(item => item.cardId === id);
-
-        if (hasExpenses) {
-          showToast("Exclua ou edite as compras deste cartão primeiro.");
-        } else if (card && confirm('Excluir o cartão "' + card.name + '"?')) {
-          state.cards = state.cards.filter(item => item.id !== id);
-          saveState();
-          showToast("Cartão excluído.");
-        }
-      }
-    });
-
-    elements.filterMonth.value = currentMonth();
-    elements.date.value = today();
-    renderAll();
+    renderTudo();
   </script>
 </body>
 </html>
